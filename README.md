@@ -6,9 +6,11 @@ This is a **REDO** of the first attempt that didn't run properly for unidentifie
 
 ## WRRC
 ![WRRC](WRRC.png)
+![WRRC W/API](WRRC%20W-API.png)
+
 
 ## Overview
-Given adequate data related to a movie, this project aims to construct a review profile for said movie in an easily readble form.
+Given adequate data related to a movie, this project aims to construct a review profile for said movie in an easily readable form.
 
 ## Getting Started
 1. Draw the web request response cycle for the task at hand
