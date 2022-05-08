@@ -27,24 +27,22 @@ Given adequate data related to a movie, this project aims to construct a review 
 
 - Home Page Endpoint: /
 
-    - reate a route with a method of get and a path of /. The callback should use the provided JSON data.
+    - Create a route with a method of get and a path of /. The callback should use the provided JSON data.
     - Create a constructor function to ensure your data follow the same format.
 
 ## - Project Features -
-
-
-
-
-
-
+- Serch
+- Filter
+- Dicover
+- Save specific Tiles
 
 
 
 # Progress report
 | Day      | Progress |
 | ----------- | ----------- |
-| 11      | May-27th: Server initialization, further work pending.       |
-|12    | Connecting to a 3rd party API,         |
+| 11      | April-27th: Server initialization, further work pending. |
+|12    | April-28th: Connecting to a 3rd party API, TMDB. |
 |13    |         |
 |14    |         |
 |15    |         |
