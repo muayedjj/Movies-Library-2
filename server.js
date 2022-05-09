@@ -26,29 +26,30 @@ let url = "postgres://mjj:0000@localhost:5432/movielibrary2";
 server.use(express.json());
 const { Client } = require('pg');
 const client = new Client(url);
-
 //---------------------------------------
 
 /*Indidvidual routes*/
 server.get("/", getrequest);
 server.get("/favourites", getfavourites);
-server.get("/trending", trending); //T12
-server.get("/search", search); //T12
-server.get("/topmovies", topmovies); //T12
-server.get("/discover", discover); //T12
-server.post('/postmovie', postHandler); //T13--http://localhost:3000/postmovie
-server.get('/getdetails', getHandler); //T13--http://localhost:3000/getdetails
-server.use(handleError); //T13
+server.get("/trending", trending);                   //T12
+server.get("/search", search);                       //T12
+server.get("/topmovies", topmovies);                 //T12
+server.get("/discover", discover);                   //T12
+server.post('/addMovie', postHandler);               //T13  http://localhost:3000/addMovie
+server.get('/getMovies', getHandler);                //T13  http://localhost:3000/getMovies
+server.put('/update/:id', updatehandeler);           //T14  http://localhost:3000/update/:id
+server.delete('/delete/:id', deletehandeler);        //T14  http://localhost:3000/delete/:id
+server.get('/getMovie/:id', getTitleByID);           //T14  http://localhost:3000/getMovie/:id
+server.use(handleError);                             //T13
+
 //----------Additional-----------
 // server.get("/latest", latest); //T12
 // server.get("/rated", rated); //T12
 // server.get("/movielist", movielist); //T12
 server.get("*", error404);
 
-// server.get("/err500", servererror500) 
-
-// Functions--------------------
-//------------T11---------------
+//----------Functions------------
+//-------------T11---------------
 /*Home*/
 function getrequest(req, res) {
     let data = new Reviews (moviesdetails.title,  moviesdetails.poster_path, moviesdetails.overview);
@@ -60,17 +61,15 @@ function getfavourites(req, res) {
     return res.status(200).send("Welcome To The Favorite Page");
 }
 /*Error 404 (Not found)*/
-
 function error404 (req,res){
-    return res.status(404).send("Sorry! The page you've requested could not be found");
+    return res.status(404).send("Oops! Sorry, the page you've requested could not be found");
 }
 
 /*Server Error 500*/
 function servererror500 (req,res){                      
     return res.status(500).send("Server Error 500! Sorry, something went wrong!");
 }
-//----------------------------------------------T12
-
+//-------------T12---------------
 function trending (req, res){
     let url = `https://api.themoviedb.org/3/trending/movie/week?api_key=${APIK}`
     let profile = []
@@ -121,7 +120,7 @@ function discover (req, res){
         res.status(200).json(discover);
     }).catch(reqerror => {console.log(reqerror)});
 }
-//T13 Functions-------------------------------------
+//-------------T13---------------
 function postHandler(req, res) {
     console.log(req.body);
 
@@ -150,11 +149,48 @@ function getHandler(req, res) {
     }).catch((err) => {
          handleError(err, req, res);
     })
- }
- function handleError(error,req,res){
-     res.status(500).send(error)
- }
- 
+}
+
+function handleError(error,req,res, next){
+    res.status(500).send(error)
+}
+
+//-------------T14---------------
+function updatehandeler (req,res)           //update movie by id
+{
+    const id = req.params.id;
+    const movie = req.body; 
+    const sql = `UPDATE movrev SET title=$1, runtime=$2, summary=$3 WHERE id = ${id} RETURNING *;`;
+    let values = [movie.title, movie.runtime, movie.summary];
+
+    client.query (sql,values).then(data=>{res.status(200).json(data.rows)
+    }).catch(error=>{
+        console.log(error);
+        handleError(error,req,res)})
+}
+
+function deletehandeler (req,res)        //Delete movie by id
+{
+    const id = req.params.id;
+    const sql = `DELETE FROM movrev WHERE id = ${id};`; 
+    client.query(sql).then(()=>{
+        res.status(200).json("Movie deleted successfully");
+    }).catch(error=>{handleError(error,req,res)})
+}
+
+function getTitleByID (req,res)        //get movie by id
+{
+    const id = req.params.id;
+    const sql = `SELECT * FROM movrev WHERE id = ${id}; RETURNING *`;
+    const values = [id]; 
+    client.query(sql,values).then(data=>{
+        res.status(200).json(data.rows)
+        }).catch(error=>{handleError(error,req,res)})
+
+}
+
+
+//--------------------------------------------------------------------------------------------------------//
 client.connect().then(() => {
     server.listen(port, () => {console.log(`Listenig to port ${port} rn, press Ctrl+C (^C) to terminate`);})
 })
