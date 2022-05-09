@@ -5,9 +5,12 @@ This is a **REDO** of the first attempt that didn't run properly for unidentifie
 **Author Name**: Mu'ayad Al Shareef
 
 ## WRRC
+Phase 1 - Day 11:
 ![WRRC](WRRC.png)
+Phase 2 - Day 12:
 ![WRRC W/API](WRRC%20W-API.png)
-
+Phase 3 - Day 13:
+![WRRC W/API+DB](WRRC%20W-API%20%26%20Local%20DB.png)
 
 ## Overview
 Given adequate data related to a movie, this project aims to construct a review profile for said movie in an easily readable form.
@@ -34,16 +37,17 @@ Given adequate data related to a movie, this project aims to construct a review 
 - Serch
 - Filter
 - Dicover
-- Save specific Tiles
+- Save specific Tiles into a local DataBase
+- Fetch/Get/Recover saved data from Local DataBase.
 
 
 
 # Progress report
 | Day      | Progress |
 | ----------- | ----------- |
-| 11      | April-27th: Server initialization, further work pending. |
-|12    | April-28th: Connecting to a 3rd party API, TMDB. |
-|13    |         |
+| 11      | April-27th: Server initialization, further work pending. [link](WRRC.png)|
+|12    | April-28th: Connecting to a 3rd party API, TMDB. [Chart](WRRC%20W-API.png) |
+|13    | May-8th: Building a local DataBase, creating a table within and starting **CRUD** processes; mainly **C**reating (*Post requests*) and **R**eading (*Get requests*). [image](WRRC%20W-API%20%26%20Local%20DB.png)|
 |14    |         |
 |15    |         |
 |16    |         |
