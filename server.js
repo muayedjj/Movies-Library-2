@@ -10,7 +10,7 @@ const axios = require ('axios'); //T12
 require(`dotenv`).config(); //T12
 const APIK = process.env.APIkey //T12
 
-server.listen(port, () => {console.log(`Listenig to port ${port} rn, press Ctrl+C (^C) to terminate`);})
+// server.listen(port, () => {console.log(`Listenig to port ${port} rn, press Ctrl+C (^C) to terminate`);})
 
 function Reviews (id, title, release_date, poster_path, overview) {
     this.id = id;
@@ -19,24 +19,36 @@ function Reviews (id, title, release_date, poster_path, overview) {
     this.poster_path = poster_path;
     this.overview = overview;
 }
+//-------------------T13------------------
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+let url = "postgres://mjj:0000@localhost:5432/movielibrary2";
+server.use(express.json());
+const { Client } = require('pg');
+const client = new Client(url);
+
+//---------------------------------------
 
 /*Indidvidual routes*/
 server.get("/", getrequest);
 server.get("/favourites", getfavourites);
 server.get("/trending", trending); //T12
-server.get("/search", search);
-server.get("/topmovies", topmovies);
-server.get("/discover", discover);
+server.get("/search", search); //T12
+server.get("/topmovies", topmovies); //T12
+server.get("/discover", discover); //T12
+server.post('/postmovie', postHandler); //T13--http://localhost:3000/postmovie
+server.get('/getdetails', getHandler); //T13--http://localhost:3000/getdetails
+server.use(handleError); //T13
 //----------Additional-----------
-// server.get("/latest", latest);
-// server.get("/rated", rated);
-// server.get("/movielist", movielist);
+// server.get("/latest", latest); //T12
+// server.get("/rated", rated); //T12
+// server.get("/movielist", movielist); //T12
 server.get("*", error404);
-
 
 // server.get("/err500", servererror500) 
 
-
+// Functions--------------------
+//------------T11---------------
 /*Home*/
 function getrequest(req, res) {
     let data = new Reviews (moviesdetails.title,  moviesdetails.poster_path, moviesdetails.overview);
@@ -109,44 +121,40 @@ function discover (req, res){
         res.status(200).json(discover);
     }).catch(reqerror => {console.log(reqerror)});
 }
+//T13 Functions-------------------------------------
+function postHandler(req, res) {
+    console.log(req.body);
 
-/*----------Additional-----------
-function latest (req, res){
-    // let movietitle = req.query.query;
-    let url = `https://api.themoviedb.org/3/movie/latest?api_key=${APIK}&language=en-US`;
-    let latest = [];
-    axios.get(url).then(result => {
-        console.log(result.data);
-        result.data.results.map(item => {
-            latest.push (new Reviews (item.id, item.title, item.release_date, item.poster_path, item.overview))
-        })
-        res.status(200).json(latest);
-    }).catch(reqerror => {console.log(reqerror)});
-}
+    let {title,runtime,summary} = req.body; //destructuring:{let title = req.body.title;
+                                                            //let time = req.body.time;    
+                                                            //let summary = req.body.summary;}
 
-function rated (req, res){
-    // let movietitle = req.query.query;
-    let url = `https://api.themoviedb.org/3/guest_session/{guest_session_id}/rated/movies?api_key=${APIK}&language=en-US&sort_by=created_at.asc`;
-    let rated = [];
-    axios.get(url).then(result => {
-        console.log(result.data);
-        result.data.results.map(item => {
-            rated.push (new Reviews (item.id, item.title, item.release_date, item.poster_path, item.overview))
-        })
-        res.status(200).json(rated);
-    }).catch(reqerror => {console.log(reqerror)});
-}
+   let sql = `INSERT INTO movrev(title,runtime,summary) VALUES($1, $2, $3) RETURNING *;`; 
+   let values = [title, runtime, summary];
+   
+    client.query(sql, values).then((result) => {
+        console.log(result);
+        // return res.status(201).json(result.rows);
 
-function movielist (req, res){
-    // let movietitle = req.query.query;
-    let url = `https://api.themoviedb.org/3/genre/movie/list?api_key=${APIK}&language=en-US    `;
-    let movielst = [];
-    axios.get(url).then(result => {
-        console.log(result.data);
-        result.data.results.map(item => {
-            movielst.push (new Reviews (item.id, item.title, item.release_date, item.poster_path, item.overview))
-        })
-        res.status(200).json(movielst);
-    }).catch(reqerror => {console.log(reqerror)});
+    }).catch((err) => {
+        handleError(err, req, res);
+    })
+
 }
---------------Task 12 Additional, end.------------*/
+//http:localhost:3000/getData
+function getHandler(req, res) {
+    let sql = `SELECT * FROM movrev;`;
+    client.query(sql).then((result)=>{
+        console.log(result);
+        res.json(result.rows);
+    }).catch((err) => {
+         handleError(err, req, res);
+    })
+ }
+ function handleError(error,req,res){
+     res.status(500).send(error)
+ }
+ 
+client.connect().then(() => {
+    server.listen(port, () => {console.log(`Listenig to port ${port} rn, press Ctrl+C (^C) to terminate`);})
+})
