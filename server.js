@@ -181,9 +181,8 @@ function deletehandeler (req,res)        //Delete movie by id
 function getTitleByID (req,res)        //get movie by id
 {
     const id = req.params.id;
-    const sql = `SELECT * FROM movrev WHERE id = ${id}; RETURNING *`;
-    const values = [id]; 
-    client.query(sql,values).then(data=>{
+    const sql = `SELECT * FROM movrev WHERE id = ${id}`;
+    client.query(sql).then(data=>{
         res.status(200).json(data.rows)
         }).catch(error=>{handleError(error,req,res)})
 
